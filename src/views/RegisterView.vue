@@ -10,22 +10,28 @@
         <input type="password" required v-model="password"/>
         <label>Password</label>
       </div>
-
       <button class="register__submit" type="submit">Register</button>
+      <button class="return" @click="redirectToHome">Return</button>
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";
 
 const email = ref("");
 const password = ref("");
+const router = useRouter();
 
 const userStore = useUserStore(); //es necesario instanciar para usar nuestro estado
 const register = () => {
   userStore.register(email.value, password.value);
+};
+
+const redirectToHome = () => {
+  router.push({ name: 'home' });
 };
 </script>
 
@@ -81,6 +87,17 @@ const register = () => {
 
 .register__submit {
   color: #1b1c1b;
+  padding: 0.7em 1.7em;
+  font-size: 18px;
+  border-radius: 0.5em;
+  background: #e8e8e8;
+  border: none;
+  cursor: pointer;
+}
+
+.return {
+  color: #1b1c1b;
+  margin-left: 3.5em;
   padding: 0.7em 1.7em;
   font-size: 18px;
   border-radius: 0.5em;

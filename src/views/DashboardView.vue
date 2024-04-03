@@ -1,8 +1,35 @@
 <template>
-  <div class="container">
-    <h1 class="title">Dashboard</h1>
+  
+    <header>
+      <h1 class="texts__title">Inicio Usuario</h1>
+    </header>
+    <!-- Anuncio de rutinas -->
+    <section class="announcement">
+      <h2 class="texts__title2">Rutinas</h2>
+      <div class="announcement__grid">
+        <!-- Recuadros de rutinas -->
+        <div class="announcement__item">Rutina 1</div>
+        <div class="announcement__item">Rutina 2</div>
+        <div class="announcement__item">Rutina 3</div>
+        <div class="announcement__item">Rutina 4</div>
+        <div class="announcement__item">Rutina 5</div>
+      </div>
+    </section>
+
+    <!-- Anuncio de dietas -->
+    <section class="announcement">
+      <h2 class="texts__title2">Dietas</h2>
+      <div class="announcement__grid">
+        <!-- Recuadros de dietas -->
+        <div class="announcement__item">Dieta 1</div>
+        <div class="announcement__item">Dieta 2</div>
+        <div class="announcement__item">Dieta 3</div>
+        <div class="announcement__item">Dieta 4</div>
+        <div class="announcement__item">Dieta 5</div>
+      </div>
+    </section>
     <button class="buttons__btn buttons__btn--logout" @click.prevent="logout">Logout</button>
-  </div>
+  
 </template>
 
 <script setup>
@@ -15,14 +42,19 @@ const logout = () => {
 </script>
 
 <style scoped>
-.container {
+header {
   width: 100%;
+  background-color: #157dcc;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+
+.texts {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  margin-top: 80px;
 }
 
 .title {
@@ -60,5 +92,20 @@ const logout = () => {
 
 .buttons__btn:active {
   transform: translateY(-1px);
+}
+.announcement {
+  margin-bottom: 20px;
+}
+
+.announcement__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.announcement__item {
+  background-color: #f0f0f0;
+  padding: 80px;
+  border-radius: 15px;
 }
 </style>

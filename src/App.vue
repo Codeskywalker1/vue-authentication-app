@@ -18,7 +18,7 @@ import { RouterView } from "vue-router";
 
 body {
   font-family: ubuntu;
-  background-color: #e8e8e8;
+  background-color: #2eb5ac;
 }
 </style>
 

@@ -1,14 +1,34 @@
-<script>
-import { RouterLink } from "vue-router";
-</script>
-
 <template>
-  <header>
-    <div class="texts">
-      <h1 class="texts__title">Basic authentication with VueJS and Firebase</h1>
-    </div>
-  </header>
-  <section class="buttons">
+  <div>
+    <header>
+      <h1 class="texts__title">Inicio Usuario</h1>
+    </header>
+
+    <!-- Anuncio de rutinas -->
+    <section class="announcement">
+      <h2 class="texts__title2">Rutinas</h2>
+      <div class="announcement__grid">
+        <!-- Recuadros de rutinas -->
+        <div class="announcement__item">Rutina 1</div>
+        <div class="announcement__item">Rutina 2</div>
+        <div class="announcement__item">Rutina 3</div>
+        <div class="announcement__item">Rutina 4</div>
+      </div>
+    </section>
+
+    <!-- Anuncio de dietas -->
+    <section class="announcement">
+      <h2 class="texts__title2">Dietas</h2>
+      <div class="announcement__grid">
+        <!-- Recuadros de dietas -->
+        <div class="announcement__item">Dieta 1</div>
+        <div class="announcement__item">Dieta 2</div>
+        <div class="announcement__item">Dieta 3</div>
+        <div class="announcement__item">Dieta 4</div>
+      </div>
+    </section>
+
+    <section class="buttons">
     <router-link class="buttons__btn buttons__btn--login" to="/login"
       >Login</router-link
     >
@@ -17,20 +37,18 @@ import { RouterLink } from "vue-router";
       >Register</router-link
     >
   </section>
+  </div>
 </template>
+
+<script>
+import { RouterLink } from "vue-router";
+</script>
 
 <style scoped>
 header {
   width: 100%;
-  height: 750px;
-  background-image: url(../assets/hero.jpg);
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  color: #fff;
+  background-color: #157dcc;
   text-align: center;
-  clip-path: polygon(100% 0, 100% 70%, 50% 100%, 0 70%, 0 0);
   margin-bottom: 50px;
 }
 
@@ -45,9 +63,15 @@ header {
   font-size: 3.5rem;
 }
 
+.texts__title2 {
+  font-size: 2.5rem;
+  padding-bottom: 20px;
+}
+
 .buttons {
   display: flex;
   justify-content: space-evenly;
+  padding-top: 100px;
 }
 
 .buttons__btn {
@@ -81,5 +105,21 @@ header {
 
 .buttons__btn:active {
   transform: translateY(-1px);
+}
+
+.announcement {
+  margin-bottom: 20px;
+}
+
+.announcement__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.announcement__item {
+  background-color: #f0f0f0;
+  padding: 80px;
+  border-radius: 15px;
 }
 </style>

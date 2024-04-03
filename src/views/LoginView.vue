@@ -12,27 +12,35 @@
       </div>
 
       <button class="login__submit" type="submit">Login</button>
+      <button class="return" @click="redirectToHome">Return</button>
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";
 
 const email = ref("");
 const password = ref("");
+const router = useRouter();
 
 const userStore = useUserStore(); 
 
 const login = () => {
   userStore.login(email.value, password.value);
 };
+  
+const redirectToHome = () => {
+  router.push({ name: 'home' });
+};
+
 </script>
 
 <style>
 .login {
-  margin: 100px auto;
+  margin: 300px auto;
   width: 400px;
   padding: 40px;
   background: #282828;
@@ -82,6 +90,17 @@ const login = () => {
 
 .login__submit {
   color: #1b1c1b;
+  padding: 0.7em 1.7em;
+  font-size: 18px;
+  border-radius: 0.5em;
+  background: #e8e8e8;
+  border: none;
+  cursor: pointer;
+}
+
+.return {
+  color: #1b1c1b;
+  margin-left: 4.5em;
   padding: 0.7em 1.7em;
   font-size: 18px;
   border-radius: 0.5em;

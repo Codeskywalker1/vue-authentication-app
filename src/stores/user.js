@@ -50,9 +50,9 @@ export const useUserStore = defineStore("user", {
       this.$router.push("/dashboard");
     },
     async logout() {
-        await signOut(auth);
-        this.user = null;
-        this.$router.push("/");
+      await signOut(auth);
+      this.user = null;
+      this.$router.push("/");
     },
   },
 });
