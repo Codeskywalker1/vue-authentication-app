@@ -18,7 +18,10 @@ import { RouterView } from "vue-router";
 
 body {
   font-family: ubuntu;
-  background-color: #2eb5ac;
+  background: -webkit-linear-gradient(90deg, rgb(169, 241, 241) 10%, rgb(0, 195, 255) 90%);
+  background: -moz-linear-gradient(90deg, rgb(169, 241, 241) 10%, rgb(0, 195, 255) 90%);
+  background: -ms-linear-gradient(90deg, rgb(169, 241, 241) 10%, rgb(0, 195, 255) 90%);
+  background: -o-linear-gradient(90deg, rgb(169, 241, 241) 10%, orange 90%);
+  background: linear-gradient(90deg, rgb(169, 241, 241) 10%, rgb(0, 195, 255) 90%);
 }
 </style>
-

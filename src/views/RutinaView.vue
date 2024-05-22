@@ -1,138 +1,287 @@
 <template>
-    <div class="plan-entrenamiento">
-      <header>
-        <div class="cuenta">
-          {{ nombreUsuario }}
-        </div>
-        <div class="mi-avance">
-          <progress-bar :porcentaje="avance" />
-        </div>
-        <div class="ranking">
-          Posición: {{ ranking }}
-        </div>
-        <div class="ranking-global">
-          <a href="#">Ranking Global</a>
-        </div>
-        <div class="citas">
-          <a href="#">Citas</a>
-        </div>
-        <div class="cerrar-sesion">
-          <a href="#">Cerrar Sesión</a>
-        </div>
-      </header>
-      <div class="rutina-content">
-        <h1>Rutina personalizada</h1>
-        <input type="date" v-model="fechaSeleccionada" @change="cargarRutina" />
-        <section v-if="rutinaCargada">
-          <ul>
-            <li v-for="ejercicio in rutina" :key="ejercicio.id">
-              <div class="nombre-ejercicio">{{ ejercicio.nombre }}</div>
-              <div class="detalle-ejercicio">
-                <span class="repeticiones">Repeticiones: {{ ejercicio.repeticiones }}</span>
-                <button @click="marcarHecho(ejercicio.id)">Hecho</button>
-              </div>
-            </li>
-          </ul>
-        </section>
-      </div>
-      <footer>
-        <button @click="regresar">Regresar</button>
-        <button @click="terminar">Terminar</button>
-      </footer>
+  <div class="container">
+    <header class="header">
+      <navBarUsuario />
+    </header>
+  </div>
+  <section>
+    <div>
+      <h2>Ingresa la Fecha</h2>
+      <vue3-datepicker v-model="fechaSeleccionada" :typeable="true" />
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'PlanEntrenamiento',
-    data() {
-      return {
-        nombreUsuario: 'Usuario',
-        avance: 50,
-        ranking: 12,
-        fechaSeleccionada: '',
-        rutinaCargada: false,
-        rutina: [
-          { id: 1, nombre: 'Press con mancuernas', repeticiones: 3, peso: 50 },
-          { id: 2, nombre: 'Dominadas', repeticiones: 4, peso: 'Sin peso' },
-          // Agregar más ejercicios
-        ],
-      };
+    <div v-if="rutinaRealizada === false">
+      <h1 id="titulo"> Rutina </h1>
+      <form @submit.prevent="handleSubmit">
+        <table class="tabla_ejercicios">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Grupo Muscular</th>
+              <th>Ejemplo</th>
+              <th>Series</th>
+              <th>Repeticiones</th>
+              <th>Descanso</th>
+              <th>Realizado</th>
+            </tr>
+          </thead>
+          <tbody v-if="rutina">
+            <tr v-for="ejercicio in rutina" :key="ejercicio.nombre">
+              <td>{{ ejercicio.nombre }}</td>
+              <td>{{ ejercicio.grupoMuscular }}</td>
+              <td>
+                <img :src="ejercicio.imagenURL" alt="Imagen del ejercicio"
+                  style="max-width: 100px; max-height: 100px" />
+              </td>
+              <td>{{ ejercicio.series }}</td>
+              <td>{{ ejercicio.repeticiones }}</td>
+              <td>{{ ejercicio.descanso }}</td>
+              <td>
+                <input type="checkbox" :id="'ejercicioRealizado-' + ejercicio.nombre"
+                  :name="'ejercicioRealizado-' + ejercicio.nombre" v-model="ejerciciosRealizados[ejercicio.nombre]"
+                  required>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <button type="submit" :disabled="!todosEjerciciosRealizados">Rutina Realizada</button>
+
+      </form>
+    </div>
+    <div v-else-if="rutinaRealizada === true">
+      <p>Se realizó la rutina</p>
+      <p>{{ rutinaRealizada }}</p>
+    </div>
+    <div v-else>
+      <p>No hay rutina</p>
+    </div>
+
+
+  </section>
+</template>
+
+<script>
+import navBarUsuario from "@/components/navBarUsuario.vue";
+import Vue3Datepicker from "vue3-datepicker";
+import { useUserStore } from "../stores/user";
+import { db, auth } from "../Firebase/index"; // Asegúrate de importar auth de Firebase
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+export default {
+  data() {
+    return {
+      ejercicios: [],
+      isLocalAdmin: false,
+      currentUserUID: null,
+      fechaSeleccionada: null, // Añade una nueva propiedad para almacenar la fecha seleccionada
+      rutina: [], // Inicializar rutina como un array vacío
+      ejerciciosRealizados: {},
+      rutinaRealizada: false,
+      usuario: null,
+    };
+  },
+  computed: {
+    todosEjerciciosRealizados() {
+      return Object.values(this.ejerciciosRealizados).every(value => value);
+    }
+  },
+
+  components: {
+    navBarUsuario,
+    Vue3Datepicker,
+  },
+  methods: {
+    async actualizarRanking() {
+  try {
+    // Obtener la referencia al documento de la colección "Ranking" para el usuario actual
+    const docRef = doc(db, 'Ranking', this.currentUserUID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // Obtener el puntaje actual del documento
+      const data = docSnap.data();
+      const puntajeActual = data.puntaje || 0;
+
+      // Sumar 10 al puntaje actual
+      const nuevoPuntaje = puntajeActual + 10;
+
+      // Actualizar el documento con el nuevo puntaje
+      await setDoc(docRef, {
+        nombre: this.usuario.nombre,
+        puntaje: nuevoPuntaje,
+        id: this.currentUserUID,
+      });
+
+      console.log('Puntaje actualizado correctamente');
+    } else {
+      console.log('No se encontró un documento de ranking para el usuario actual. Creando uno nuevo...');
+
+      // Crear un nuevo documento en la colección "Ranking" para el usuario actual
+      await setDoc(docRef, {
+        nombre: this.usuario.nombre,
+        puntaje: 10, // Empezar con un puntaje de 10
+        id: this.currentUserUID,
+      });
+
+      console.log('Documento de ranking creado correctamente');
+    }
+  } catch (error) {
+    console.error('Error al actualizar el puntaje:', error);
+  }
+},
+
+    async usuarioCargado() {
+      try {
+        const docRef = doc(db, "usuarios", this.currentUserUID);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const usuario = docSnap.data();
+          usuario.id = docSnap.id; // Agrega el ID del documento al objeto usuario
+          this.usuario = usuario;
+          console.log("Usuario cargado:", this.usuario);
+        } else {
+          console.log("No existe el usuario con el ID especificado");
+        }
+      } catch (error) {
+        console.error("Error al cargar el usuario:", error);
+      }
     },
-    methods: {
-      cargarRutina() {
-        // Aquí puedes cargar la rutina correspondiente a la fecha seleccionada
-        this.rutinaCargada = true;
-      },
-      marcarHecho(idEjercicio) {
-        // Aquí puedes implementar la lógica para marcar el ejercicio como hecho
-        console.log(`Ejercicio ${idEjercicio} marcado como hecho`);
-      },
-      regresar() {
-        // Aquí puedes implementar la lógica para regresar
-      },
-      terminar() {
-        // Aquí puedes implementar la lógica para terminar y enviar la rutina
-      },
+    async handleSubmit() {
+      // Actualizar ejerciciosRealizados a true para cada ejercicio
+      this.rutina.forEach(ejercicio => {
+        this.ejerciciosRealizados[ejercicio.nombre] = true;
+      });
+
+      // Obtener la referencia al documento de la rutina del usuario para la fecha seleccionada
+      const docRef = doc(db, 'rutinas', this.currentUserUID);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const rutinas = docSnap.data();
+        const fechaFormateada = this.fechaSeleccionada.toLocaleDateString('es-ES');
+        if (rutinas[fechaFormateada]) {
+          // Actualizar los ejercicios realizados en la rutina para la fecha seleccionada
+          Object.keys(rutinas[fechaFormateada]).forEach(ejercicio => {
+            rutinas[fechaFormateada][ejercicio].ejercicioRealizado = this.ejerciciosRealizados[ejercicio] || false;
+          });
+
+          // Actualizar el documento en Firestore
+          await setDoc(docRef, rutinas);
+          console.log('Rutina guardada con éxito');
+
+
+        } else {
+          console.error('No hay rutina para la fecha seleccionada');
+        }
+      } else {
+        console.error('Error al recuperar la rutina del usuario:', this.currentUserUID);
+      }
+      await this.actualizarRanking();
+      //window.location.reload();
     },
-  };
-  </script>
-  
-  <style>
-  /* Estilos para la interfaz */
-  
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
-  }
-  
-  input[type="date"] {
-    padding: 5px;
-    font-size: 14px;
-  }
-  
-  .rutina-content {
-    padding: 20px;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .nombre-ejercicio {
-    font-weight: bold;
-  }
-  
-  .repeticiones {
-    margin-right: 10px;
-  }
-  
-  button {
-    padding: 5px 10px;
-    font-size: 14px;
-    border: none;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  footer {
-    padding: 20px;
-    text-align: right;
-  }
-  
-  </style>
-  
+
+    async mostrarRutina() {
+      if (!this.fechaSeleccionada) {
+        return; // No mostrar nada si no hay fecha seleccionada
+      }
+
+      const fechaFormateada = this.fechaSeleccionada.toLocaleDateString('es-ES');
+      const docRef = doc(db, 'rutinas', this.currentUserUID);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const rutinas = docSnap.data();
+        if (rutinas[fechaFormateada]) {
+          const rutinaDelDia = rutinas[fechaFormateada];
+          this.rutina = Object.keys(rutinaDelDia).map(nombreEjercicio => {
+            const ejercicio = rutinaDelDia[nombreEjercicio];
+            return {
+              nombre: nombreEjercicio,
+              grupoMuscular: ejercicio.grupoMuscular,
+              imagenURL: ejercicio.imagenURL,
+              series: ejercicio.series,
+              repeticiones: ejercicio.repeticiones,
+              descanso: ejercicio.descanso,
+              ejercicioRealizado: ejercicio.ejercicioRealizado,
+            };
+          });
+          // Validar si todos los ejercicios están marcados como realizados
+          this.rutinaRealizada = this.rutina.every(ejercicio => ejercicio.ejercicioRealizado);
+        } else {
+          this.rutina = []; // No hay rutina para la fecha seleccionada
+        }
+      } else {
+        console.error('Error al recuperar la rutina del usuario:', this.currentUserUID);
+      }
+    },
+  },
+
+
+  beforeRouteEnter(to, from, next) {
+    const userStore = useUserStore();
+    const isLocalAdmin = userStore.isAdmin;
+    console.log(`isAdmin dentro del before es: ${userStore.isAdmin}`);
+    next((vm) => {
+      vm.isLocalAdmin = isLocalAdmin;
+    });
+  },
+  mounted() {
+    // Escuchar cambios en la autenticación
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.currentUserUID = user.uid;
+        console.log("El usuario actual es ", this.currentUserUID);
+        this.usuarioCargado();
+      }
+    });
+  },
+  watch: {
+    fechaSeleccionada() {
+      this.mostrarRutina(); // Mostrar rutina al cambiar la fecha seleccionada
+    }
+  },
+
+};
+
+</script>
+
+<style>
+.tabla_ejercicios {
+  text-align: center;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+
+.tabla_ejercicios input {
+  max-width: 7ch;
+
+}
+
+.tabla_ejercicios td,
+.tabla_ejercicios th {
+  max-width: 20ch;
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.tabla_ejercicios th {
+  background-color: #030303;
+}
+
+
+
+.tabla_ejercicios tr:nth-child(odd) {
+  background-color: #007bff;
+  /* Color azul para filas impares */
+  color: white;
+}
+
+.tabla_ejercicios tr:nth-child(even) {
+  background-color: #cceeff;
+  /* Color azul más suave para filas pares */
+}
+</style>

@@ -1,6 +1,10 @@
 // Import the functions you need from the SDKs you need
+
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; //optener la autenticación
+import { getFirestore } from "firebase/firestore"; // Firestore
+import { getStorage } from "firebase/storage"; // Storage
+import { getAuth } from "firebase/auth"; // Autenticación
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB5m5QHhnzlir4XQj5dCbZiSJgDfdXNU8c",
@@ -8,11 +12,15 @@ const firebaseConfig = {
   projectId: "authentication-app-ec68a",
   storageBucket: "authentication-app-ec68a.appspot.com",
   messagingSenderId: "513259878646",
-  appId: "1:513259878646:web:25eaff55c8ddc1b2ddd4d7"
+  appId: "1:513259878646:web:25eaff55c8ddc1b2ddd4d7",
 };
-// Initialize Firebase
+
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+// Obtener instancias de los servicios
+const auth = getAuth(app); // Autenticación
+const db = getFirestore(app); // Firestore
+const storage = getStorage(app); // Storage
 
-export { auth };
+export { auth, db, storage, ref, uploadBytes, getDownloadURL, listAll };

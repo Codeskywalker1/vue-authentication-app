@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { auth } from "../Firebase";
+import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,54 +21,96 @@ const router = createRouter({
       component: () => import("../views/RegisterView.vue"),
     },
     {
-      path: "/registro1",
-      name: "registro1",
-      component: () => import("../views/Registro1View.vue"),
+      path: "/rutinapublico/:id", // Usamos :id para indicar que este es un parámetro dinámico
+      name: "rutinapublico",
+      component: () => import("../views/RutinaPublicoView.vue"),
+      props: true, // Permite pasar el parámetro como una prop al componente
     },
     {
-      path: "/registro2",
-      name: "registro2",
-      component: () => import("../views/Registro2View.vue"),
-    },
-    {
-      path: "/registro3",
-      name: "registro3",
-      component: () => import("../views/Registro3View.vue"),
-    },
-    {
-      path: "/rutina",
+      path: "/rutina", // Usamos :id para indicar que este es un parámetro dinámico
       name: "rutina",
       component: () => import("../views/RutinaView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: false,
+      },
+    },
+    {
+      path: "/dietapublico/:id",
+      name: "dietapublico",
+      component: () => import("../views/DietaPublicoView.vue"),
+      props: true,
     },
     {
       path: "/dieta",
       name: "dieta",
       component: () => import("../views/DietaView.vue"),
-    },
-    {
-      path: "/citas",
-      name: "citas",
-      component: () => import("../views/CitasView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: false,
+      },
     },
     {
       path: "/clientes",
       name: "clientes",
       component: () => import("../views/ClientesView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
+    },
+    {
+      path: "/citas",
+      name: "citas",
+      component: () => import("../views/CitasView.vue"),
+      meta: {
+        auth: true,
+      },
     },
     {
       path: "/asignarrutina",
       name: "asignarrutina",
       component: () => import("../views/AsignarRutinaView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
     },
     {
       path: "/asignardieta",
       name: "asignardieta",
       component: () => import("../views/AsignarDietaView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
     },
     {
       path: "/ejercicios",
       name: "ejercicios",
       component: () => import("../views/EjerciciosView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
+    },
+    {
+      path: "/alimentos",
+      name: "alimentos",
+      component: () => import("../views/AlimentosView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
+    },
+    {
+      path: "/citasadministrador",
+      name: "citasadministrador",
+      component: () => import("../views/CitasAdministradorView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
     },
     {
       path: "/dashboard",
@@ -75,31 +118,96 @@ const router = createRouter({
       component: () => import("../views/DashboardView.vue"),
       meta: {
         auth: true,
+        isAdmin: false,
       },
     },
     {
       path: "/ranking",
       name: "ranking",
       component: () => import("../views/RankingView.vue"),
+      meta: {
+        auth: true,
+      },
+    },
+    {
+      path: "/datos",
+      name: "datos",
+      component: () => import("../views/DatosView.vue"),
+      meta: {
+        auth: true,
+      },
+    },
+    {
+      path: "/registroAdmind",
+      name: "registroAdmind",
+      component: () => import("../views/RegistroAdmindView.vue"),
+      meta: {
+        auth: true,
+        isAdmin: true,
+      },
+    },
+    {
+      path: "/avances",
+      name: "avances",
+      component: () => import("../views/AvancesView.vue"),
+      meta: {
+        auth: true,
+      },
     },
   ],
 });
 
+// Observador de cambios de estado de autenticación de Firebase
+auth.onAuthStateChanged((user) => {
+  const isAuthenticated = !!user;
+  const authData = {
+    isAuthenticated: isAuthenticated,
+  };
+  localStorage.setItem("auth", JSON.stringify(authData));
+});
+
 router.beforeEach((to, from, next) => {
-  console.log(
-    "Este es to" + to.path,
-    "Este es from" + from,
-    "Este es next" + next.path
-  );
-  if (to.path === "/login" && auth.currentUser) {
+  const isAuthenticated = JSON.parse(
+    localStorage.getItem("auth")
+  ).isAuthenticated;
+
+  // Acceder al estado de autenticación y de administrador desde Pinia
+  const userStore = useUserStore();
+  const isAdmin = userStore.isAdmin;
+  //console.log(`Usuario autenticado en el router: ${isAuthenticated}`);
+  //console.log(`Valor de isAdmin en el router: ${userStore.isAdmin}`);
+
+  if (
+    (to.path === "/login" || to.path === "/register" || to.path === "/") &&
+    isAuthenticated
+  ) {
     next("/dashboard");
   } else if (
     to.matched.some((record) => record.meta.auth) &&
-    !auth.currentUser
+    !isAuthenticated
   ) {
     next("/login");
+    // para administradores
+  } else if (
+    to.matched.some((record) => record.meta.auth) &&
+    to.matched.some((record) => record.meta.isAdmin === true) &&
+    isAdmin === false
+  ) {
+    console.clear();
+    console.log("Soy el del administrador");
+    next("/dashboard");
+    //para usuarios
+  } else if (
+    to.matched.some((record) => record.meta.auth) &&
+    to.matched.some((record) => record.meta.isAdmin === false) &&
+    isAdmin === true
+  ) {
+    console.clear();
+    console.log("Soy el del usuario");
+    next("/clientes");
   } else {
     next();
   }
 });
+
 export default router;
