@@ -18,17 +18,12 @@
             <label for="fechaCita">Fecha de la Cita:</label>
             <Vue3Datepicker v-model="fechaCita" :typeable="true" required />
           </div>
-          <div>
+          <div v-if="tipoCita && fechaCita">
             <label for="horaCita">Hora de la Cita:</label>
-            <select v-model="horaCita" id="horaCita" required>
-              <option value="15:00">15:00</option>
-              <option value="16:00">16:00</option>
-              <option value="17:00">17:00</option>
-              <option value="18:00">18:00</option>
-              <option value="19:00">19:00</option>
-              <option value="20:00">20:00</option>
-              <option value="21:00">21:00</option>
+            <select v-if="horasDisponibles.length" v-model="horaCita" id="horaCita" required>
+              <option v-for="hora in horasDisponibles" :key="hora" :value="hora">{{ hora }}</option>
             </select>
+            <p v-else>Ya no hay citas para este día</p>
           </div>
           <div class="button">
             <button type="submit">Agendar Cita</button>
@@ -70,8 +65,10 @@ export default {
       tipoCita: "",
       fechaCita: null,
       horaCita: null,
-      horarios: [],
-      citasPorTipo: {}
+      horarios: ["15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"],
+      citasPorTipo: {},
+      todasLasCitas: [],
+      horasDisponibles: [],
     };
   },
   methods: {
@@ -88,9 +85,8 @@ export default {
           return;
         }
 
-        const fecha = this.fechaCita.toISOString().split('T')[0]; // Formatear fecha
+        const fecha = this.fechaCita.toISOString().split('T')[0];
 
-        // Agregar la cita en la base de datos
         const citaRef = doc(db, "citas", uidToUse);
         const citaDoc = await getDoc(citaRef);
 
@@ -114,7 +110,8 @@ export default {
         this.fechaCita = null;
         this.horaCita = null;
         this.tipoCita = "";
-        this.mostrarCitas(); // Actualizar citas mostradas
+        this.mostrarCitas();
+        this.cargarTodasLasCitas();
       } catch (error) {
         console.error("Error al agendar la cita:", error);
       }
@@ -150,16 +147,54 @@ export default {
       } catch (error) {
         console.error("Error al mostrar las citas:", error);
       }
+    },
+    async cargarTodasLasCitas() {
+      try {
+        const citasSnapshot = await getDocs(collection(db, "citas"));
+        const todasLasCitas = [];
+
+        citasSnapshot.forEach((doc) => {
+          const citas = doc.data().citas || {};
+          for (const [fecha, citasEnFecha] of Object.entries(citas)) {
+            for (const cita of citasEnFecha) {
+              todasLasCitas.push({ tipo: cita.tipo, fecha, hora: cita.hora });
+            }
+          }
+        });
+
+        this.todasLasCitas = todasLasCitas;
+        this.actualizarHorasDisponibles();
+      } catch (error) {
+        console.error("Error al cargar todas las citas:", error);
+      }
+    },
+    actualizarHorasDisponibles() {
+      if (!this.tipoCita || !this.fechaCita) {
+        this.horasDisponibles = this.horarios;
+        return;
+      }
+
+      const fecha = this.fechaCita.toISOString().split('T')[0];
+      const citasEnFecha = this.todasLasCitas.filter(cita => cita.tipo === this.tipoCita && cita.fecha === fecha);
+
+      const horasOcupadas = citasEnFecha.map(cita => cita.hora);
+      this.horasDisponibles = this.horarios.filter(hora => !horasOcupadas.includes(hora));
+    }
+  },
+  watch: {
+    tipoCita() {
+      this.actualizarHorasDisponibles();
+    },
+    fechaCita() {
+      this.actualizarHorasDisponibles();
     }
   },
   beforeRouteEnter(to, from, next) {
     const userStore = useUserStore();
     const selectedUserId = userStore.selectedUserId;
     const isLocalAdmin = userStore.isAdmin;
-    console.log(`Se selecciono al usuario: ${selectedUserId}`);
-    console.log(`isAdmin dentro del before es: ${userStore.isAdmin}`);
     next((vm) => {
-      vm.selectedUserId = selectedUserId; // Asigna el ID del usuario seleccionado a la variable local
+      vm.selectedUserId = selectedUserId;
       vm.isLocalAdmin = isLocalAdmin;
     });
   },
@@ -167,8 +202,8 @@ export default {
     auth.onAuthStateChanged((user) => {
       if (user) {
         this.currentUserUID = user.uid;
-        console.log("El usuario actual es ", this.currentUserUID);
-        this.mostrarCitas(); // Mostrar citas al montar el componente
+        this.mostrarCitas();
+        this.cargarTodasLasCitas();
       }
     });
   },
