@@ -5,6 +5,9 @@
     </header>
     <section>
       <div>
+        <h1 v-if="usuario">Rutina para {{ usuario.nombre }}</h1>
+        <h1 v-if="usuario">Con id {{ usuario.id }}</h1>
+        <h1 v-else>No se selecciono ningun usuario</h1>
         <h2>Ingresa la Fecha</h2>
         <vue3-datepicker v-model="fechaSeleccionada" :typeable="true" />
       </div>
@@ -56,72 +59,73 @@
             </div>
           </div>
           <table class="tabla_alimentos" v-if="filtroCategorias">
-            <div>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Categoria</th>
-                  <th>energia</th>
-                  <th>Proteinas</th>
-                  <th>Grasas</th>
-                  <th>Hidratos de Carbono</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(alimento, index) in alimentosFiltrados" :key="index" :class="{
-                  'fila-par': index % 2 === 0,
-                  'fila-impar': index % 2 !== 0,
-                }">
-                  <td>{{ alimento.nombre }}</td>
-                  <td>{{ alimento.categoria }}</td>
-                  <td>{{ alimento.energia }}</td>
-                  <td>{{ alimento.proteinas }}</td>
-                  <td>{{ alimento.grasas }}</td>
-                  <td>{{ alimento.hidratosDeCarbono }}</td>
-                  <td>
-                    <button @click="seleccionarAlimento(alimento)">
-                      {{ alimentosSeleccionados.find(e => e.nombre === alimento.nombre) ? 'Quitar' : 'Agregar' }}
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </div>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Categoria</th>
+                <th>energia</th>
+                <th>Proteinas</th>
+                <th>Grasas</th>
+                <th>Hidratos de Carbono</th>
+                <th>Porciones</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(alimento, index) in alimentosFiltrados" :key="index" :class="{
+                'fila-par': index % 2 === 0,
+                'fila-impar': index % 2 !== 0,
+              }">
+                <td>{{ alimento.nombre }}</td>
+                <td>{{ alimento.categoria }}</td>
+                <td>{{ alimento.energia }}</td>
+                <td>{{ alimento.proteinas }}</td>
+                <td>{{ alimento.grasas }}</td>
+                <td>{{ alimento.hidratosDeCarbono }}</td>
+                <input type="text" v-model="alimento.porciones" />
+                <td>
+                  <button @click="seleccionarAlimento(alimento)">
+                    {{ alimentosSeleccionados.find(e => e.nombre === alimento.nombre) ? 'Quitar' : 'Agregar' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </section>
       <section class="section-right">
         <h1 id="titulo"> Dieta </h1>
-        <table class="tabla_alimentos">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Nombre</th>
-              <th>Categoria</th>
-              <th>energia</th>
-              <th>Proteinas</th>
-              <th>Grasas</th>
-              <th>Hidratos de Carbono</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody v-if="dieta">
-            <tr v-for="(tipoComida, alimentos) in dieta" :key="tipoComida">
-              <td :rowspan="alimentos.length">{{ tipoComida }}</td>
-            <tr v-for="alimento in alimentos" :key="alimento.nombre">
-              <td>{{ alimento.nombre }}</td>
-              <td>{{ alimento.categoria }}</td>
-              <td>{{ alimento.energia }}</td>
-              <td>{{ alimento.proteinas }}</td>
-              <td>{{ alimento.grasas }}</td>
-              <td>{{ alimento.hidratosDeCarbono }}</td>
-              <td>
-                <button @click="eliminarAlimento(alimento, tipoComida)">Eliminar</button>
-              </td>
-            </tr>
-            </tr>
-          </tbody>
-        </table>
+        <div v-for="(alimentos, tipo) in dietaPorTipo" :key="tipo">
+          <h2>{{ tipo }}</h2> <!-- Esto muestra el nombre del tipo, podrías cambiarlo a lo que necesites -->
+          <table class="tabla_alimentos">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Categoria</th>
+                <th>energia</th>
+                <th>Proteinas</th>
+                <th>Grasas</th>
+                <th>Hidratos de Carbono</th>
+                <th>Porciones</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="alimento in alimentos" :key="alimento.nombre">
+                <td>{{ alimento.nombre }}</td>
+                <td>{{ alimento.categoria }}</td>
+                <td>{{ alimento.energia }}</td>
+                <td>{{ alimento.proteinas }}</td>
+                <td>{{ alimento.grasas }}</td>
+                <td>{{ alimento.hidratosDeCarbono }}</td>
+                <td>{{ alimento.porciones }}</td>
+                <td>
+                  <button @click="eliminarAlimento(alimento, tipo)">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   </div>
@@ -169,6 +173,21 @@ export default {
         );
       }
       return alimentosFiltrados;
+    },
+    dietaPorTipo() {
+      const dietaPorTipo = {
+        Desayuno: [],
+        Comida: [],
+        Cena: [],
+      };
+
+      for (const tipoComida in this.dieta) {
+        if (dietaPorTipo[tipoComida]) {
+          dietaPorTipo[tipoComida] = this.dieta[tipoComida];
+        }
+      }
+
+      return dietaPorTipo;
     },
   },
   methods: {
@@ -234,13 +253,10 @@ export default {
 
         this.alimentosSeleccionados.forEach((alimento) => {
           alimentosDieta[alimento.nombre] = {
-            nombre: alimento.nombre,
-            categoria: alimento.categoria,
-            energia: alimento.energia,
-            proteinas: alimento.proteinas,
-            grasas: alimento.grasas,
-            hidratosDeCarbono: alimento.hidratosDeCarbono,
+            ...alimento,
             tipoComida: this.tipoComida,
+            porciones: alimento.porciones,
+            alimentoCompletado: false,
           };
         });
 
@@ -290,6 +306,24 @@ export default {
         console.error("Error al cargar los alimentos:", error);
       }
     },
+    async usuarioCargado() {
+      try {
+        console.log(`Se selecciono al usuario: ${this.selectedUserId}`);
+        const docRef = doc(db, "usuarios", this.selectedUserId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const usuario = docSnap.data();
+          usuario.id = docSnap.id; // Agrega el ID del documento al objeto usuario
+          this.usuario = usuario;
+          console.log("Usuario cargado:", this.usuario);
+        } else {
+          console.log("No existe el usuario con el ID especificado");
+        }
+      } catch (error) {
+        console.error("Error al cargar el usuario:", error);
+      }
+    },
   },
 
   beforeRouteEnter(to, from, next) {
@@ -306,6 +340,7 @@ export default {
 
   mounted() {
     this.alimentosCargado();
+    this.usuarioCargado();
   },
 
   watch: {
@@ -315,6 +350,7 @@ export default {
   },
 };
 </script>
+
 <style>
 .container {
   display: flex;
@@ -367,10 +403,8 @@ export default {
   margin-bottom: 20px;
 }
 
-
 .tabla_alimentos input {
   max-width: 7ch;
-
 }
 
 .tabla_alimentos td,
@@ -383,8 +417,6 @@ export default {
 .tabla_alimentos th {
   background-color: #030303;
 }
-
-
 
 .tabla_alimentos tr:nth-child(odd) {
   background-color: #007bff;

@@ -5,7 +5,7 @@
       <div class="form-row">
         <div class="form-group" :class="{ focused: formData.nombres !== '' }">
           <input type="text" id="nombres" name="nombres" v-model="formData.nombres" :readonly="!formDataEditable"
-            required autocomplete="off"/>
+            required autocomplete="off" />
           <label for="nombres" v-bind:class="{
             active: formData.nombres !== '',
             'fixed-label': !formDataEditable,
@@ -15,7 +15,7 @@
         </div>
         <div class="form-group" :class="{ focused: formData.apellidoPaterno !== '' }">
           <input type="text" id="apellidoPaterno" name="apellidoPaterno" v-model="formData.apellidoPaterno"
-            :readonly="!formDataEditable" required autocomplete="off"/>
+            :readonly="!formDataEditable" required autocomplete="off" />
           <label for="apellidoPaterno" v-bind:class="{
             active: formData.apellidoPaterno !== '',
             'fixed-label': !formDataEditable,
@@ -27,7 +27,7 @@
       <div class="form-row">
         <div class="form-group" :class="{ focused: formData.apellidoMaterno !== '' }">
           <input type="text" id="apellidoMaterno" name="apellidoMaterno" v-model="formData.apellidoMaterno"
-            :readonly="!formDataEditable" required autocomplete="off"/>
+            :readonly="!formDataEditable" required autocomplete="off" />
           <label for="apellidoMaterno" v-bind:class="{
             active: formData.apellidoMaterno !== '',
             'fixed-label': !formDataEditable,

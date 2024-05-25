@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  date-fns:
+    specifier: ^3.6.0
+    version: 3.6.0
   firebase:
     specifier: ^10.7.1
     version: 10.7.1
@@ -14,12 +17,18 @@ dependencies:
   vue:
     specifier: ^3.2.33
     version: 3.2.33
+  vue-datepicker-next:
+    specifier: ^1.0.3
+    version: 1.0.3(vue@3.2.33)
   vue-router:
     specifier: ^4.0.14
     version: 4.0.14(vue@3.2.33)
   vue3-datepicker:
     specifier: ^0.4.0
     version: 0.4.0(vue@3.2.33)
+  vuelidate:
+    specifier: ^0.7.7
+    version: 0.7.7
 
 devDependencies:
   '@vitejs/plugin-vue':
@@ -707,6 +716,14 @@ packages:
       '@babel/runtime': 7.24.4
     dev: false
 
+  /date-fns@3.6.0:
+    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
+    dev: false
+
+  /date-format-parse@0.2.7:
+    resolution: {integrity: sha512-/+lyMUKoRogMuTeOVii6lUwjbVlesN9YRYLzZT/g3TEZ3uD9QnpjResujeEqUW+OSNbT7T1+SYdyEkTcRv+KDQ==}
+    dev: false
+
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
     dev: false
@@ -967,8 +984,8 @@ packages:
       - '@react-native-async-storage/async-storage'
     dev: false
 
-  /fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+  /fsevents@2.3.3:
+    resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
@@ -1106,7 +1123,7 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
-      fsevents: 2.3.2
+      fsevents: 2.3.3
     dev: true
 
   /safe-buffer@5.2.1:
@@ -1185,8 +1202,17 @@ packages:
       resolve: 1.22.0
       rollup: 2.70.2
     optionalDependencies:
-      fsevents: 2.3.2
+      fsevents: 2.3.3
     dev: true
+
+  /vue-datepicker-next@1.0.3(vue@3.2.33):
+    resolution: {integrity: sha512-Brqjh896BJGVxP7d6tGDsPMu0SDAB8hAdtG7zWF8VIHJB21dk1VB9KgdajD9Y9uXbg+wHN0vmL7sbMPIyehQVQ==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      date-format-parse: 0.2.7
+      vue: 3.2.33
+    dev: false
 
   /vue-demi@0.12.5(vue@3.2.33):
     resolution: {integrity: sha512-BREuTgTYlUr0zw0EZn3hnhC3I6gPWv+Kwh4MCih6QcAeaTlaIX0DwOVN0wHej7hSvDPecz4jygy/idsgKfW58Q==}
@@ -1230,6 +1256,11 @@ packages:
       '@vue/runtime-dom': 3.2.33
       '@vue/server-renderer': 3.2.33(vue@3.2.33)
       '@vue/shared': 3.2.33
+
+  /vuelidate@0.7.7:
+    resolution: {integrity: sha512-pT/U2lDI67wkIqI4tum7cMSIfGcAMfB+Phtqh2ttdXURwvHRBJEAQ0tVbUsW9Upg83Q5QH59bnCoXI7A9JDGnA==}
+    engines: {node: '>= 4.0.0', npm: '>= 3.0.0'}
+    dev: false
 
   /websocket-driver@0.7.4:
     resolution: {integrity: sha512-b17KeDIQVjvb0ssuSDF2cYXSg2iztliJ4B9WdsuB6J952qCPKmnVq4DyW5motImXHDC1cBT/1UezrJVsKw5zjg==}

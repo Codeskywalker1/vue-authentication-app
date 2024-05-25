@@ -24,7 +24,7 @@
               <th>Realizado</th>
             </tr>
           </thead>
-          <tbody v-if="rutina">
+          <tbody v-if="rutina.length">
             <tr v-for="ejercicio in rutina" :key="ejercicio.nombre">
               <td>{{ ejercicio.nombre }}</td>
               <td>{{ ejercicio.grupoMuscular }}</td>
@@ -38,14 +38,13 @@
               <td>
                 <input type="checkbox" :id="'ejercicioRealizado-' + ejercicio.nombre"
                   :name="'ejercicioRealizado-' + ejercicio.nombre" v-model="ejerciciosRealizados[ejercicio.nombre]"
-                  required>
+                  @change="checkAllEjerciciosRealizados">
               </td>
             </tr>
           </tbody>
         </table>
 
-
-        <button type="submit" :disabled="!todosEjerciciosRealizados">Rutina Realizada</button>
+        <button type="submit" :disabled="!rutina.length || !todosEjerciciosRealizados">Rutina Realizada</button>
 
       </form>
     </div>
@@ -56,8 +55,6 @@
     <div v-else>
       <p>No hay rutina</p>
     </div>
-
-
   </section>
 </template>
 
@@ -65,7 +62,7 @@
 import navBarUsuario from "@/components/navBarUsuario.vue";
 import Vue3Datepicker from "vue3-datepicker";
 import { useUserStore } from "../stores/user";
-import { db, auth } from "../Firebase/index"; // Asegúrate de importar auth de Firebase
+import { db, auth } from "../Firebase/index";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default {
@@ -74,8 +71,8 @@ export default {
       ejercicios: [],
       isLocalAdmin: false,
       currentUserUID: null,
-      fechaSeleccionada: null, // Añade una nueva propiedad para almacenar la fecha seleccionada
-      rutina: [], // Inicializar rutina como un array vacío
+      fechaSeleccionada: null,
+      rutina: [],
       ejerciciosRealizados: {},
       rutinaRealizada: false,
       usuario: null,
@@ -83,53 +80,46 @@ export default {
   },
   computed: {
     todosEjerciciosRealizados() {
-      return Object.values(this.ejerciciosRealizados).every(value => value);
+      return this.rutina.length && Object.values(this.ejerciciosRealizados).every(value => value);
     }
   },
-
   components: {
     navBarUsuario,
     Vue3Datepicker,
   },
   methods: {
     async actualizarRanking() {
-  try {
-    // Obtener la referencia al documento de la colección "Ranking" para el usuario actual
-    const docRef = doc(db, 'Ranking', this.currentUserUID);
-    const docSnap = await getDoc(docRef);
+      try {
+        const docRef = doc(db, 'Ranking', this.currentUserUID);
+        const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      // Obtener el puntaje actual del documento
-      const data = docSnap.data();
-      const puntajeActual = data.puntaje || 0;
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const puntajeActual = data.puntaje || 0;
+          const nuevoPuntaje = puntajeActual + 10;
 
-      // Sumar 10 al puntaje actual
-      const nuevoPuntaje = puntajeActual + 10;
+          await setDoc(docRef, {
+            nombre: this.usuario.nombre,
+            puntaje: nuevoPuntaje,
+            id: this.currentUserUID,
+          });
 
-      // Actualizar el documento con el nuevo puntaje
-      await setDoc(docRef, {
-        nombre: this.usuario.nombre,
-        puntaje: nuevoPuntaje,
-        id: this.currentUserUID,
-      });
+          console.log('Puntaje actualizado correctamente');
+        } else {
+          console.log('No se encontró un documento de ranking para el usuario actual. Creando uno nuevo...');
 
-      console.log('Puntaje actualizado correctamente');
-    } else {
-      console.log('No se encontró un documento de ranking para el usuario actual. Creando uno nuevo...');
+          await setDoc(docRef, {
+            nombre: this.usuario.nombre,
+            puntaje: 10,
+            id: this.currentUserUID,
+          });
 
-      // Crear un nuevo documento en la colección "Ranking" para el usuario actual
-      await setDoc(docRef, {
-        nombre: this.usuario.nombre,
-        puntaje: 10, // Empezar con un puntaje de 10
-        id: this.currentUserUID,
-      });
-
-      console.log('Documento de ranking creado correctamente');
-    }
-  } catch (error) {
-    console.error('Error al actualizar el puntaje:', error);
-  }
-},
+          console.log('Documento de ranking creado correctamente');
+        }
+      } catch (error) {
+        console.error('Error al actualizar el puntaje:', error);
+      }
+    },
 
     async usuarioCargado() {
       try {
@@ -138,7 +128,7 @@ export default {
 
         if (docSnap.exists()) {
           const usuario = docSnap.data();
-          usuario.id = docSnap.id; // Agrega el ID del documento al objeto usuario
+          usuario.id = docSnap.id;
           this.usuario = usuario;
           console.log("Usuario cargado:", this.usuario);
         } else {
@@ -149,12 +139,10 @@ export default {
       }
     },
     async handleSubmit() {
-      // Actualizar ejerciciosRealizados a true para cada ejercicio
       this.rutina.forEach(ejercicio => {
         this.ejerciciosRealizados[ejercicio.nombre] = true;
       });
 
-      // Obtener la referencia al documento de la rutina del usuario para la fecha seleccionada
       const docRef = doc(db, 'rutinas', this.currentUserUID);
       const docSnap = await getDoc(docRef);
 
@@ -162,16 +150,12 @@ export default {
         const rutinas = docSnap.data();
         const fechaFormateada = this.fechaSeleccionada.toLocaleDateString('es-ES');
         if (rutinas[fechaFormateada]) {
-          // Actualizar los ejercicios realizados en la rutina para la fecha seleccionada
           Object.keys(rutinas[fechaFormateada]).forEach(ejercicio => {
             rutinas[fechaFormateada][ejercicio].ejercicioRealizado = this.ejerciciosRealizados[ejercicio] || false;
           });
 
-          // Actualizar el documento en Firestore
           await setDoc(docRef, rutinas);
           console.log('Rutina guardada con éxito');
-
-
         } else {
           console.error('No hay rutina para la fecha seleccionada');
         }
@@ -184,7 +168,7 @@ export default {
 
     async mostrarRutina() {
       if (!this.fechaSeleccionada) {
-        return; // No mostrar nada si no hay fecha seleccionada
+        return;
       }
 
       const fechaFormateada = this.fechaSeleccionada.toLocaleDateString('es-ES');
@@ -207,17 +191,23 @@ export default {
               ejercicioRealizado: ejercicio.ejercicioRealizado,
             };
           });
-          // Validar si todos los ejercicios están marcados como realizados
+          this.ejerciciosRealizados = this.rutina.reduce((acc, ejercicio) => {
+            acc[ejercicio.nombre] = ejercicio.ejercicioRealizado || false;
+            return acc;
+          }, {});
           this.rutinaRealizada = this.rutina.every(ejercicio => ejercicio.ejercicioRealizado);
         } else {
-          this.rutina = []; // No hay rutina para la fecha seleccionada
+          this.rutina = [];
+          this.ejerciciosRealizados = {};
         }
       } else {
         console.error('Error al recuperar la rutina del usuario:', this.currentUserUID);
       }
     },
+    checkAllEjerciciosRealizados() {
+      this.$forceUpdate();
+    },
   },
-
 
   beforeRouteEnter(to, from, next) {
     const userStore = useUserStore();
@@ -228,7 +218,6 @@ export default {
     });
   },
   mounted() {
-    // Escuchar cambios en la autenticación
     auth.onAuthStateChanged((user) => {
       if (user) {
         this.currentUserUID = user.uid;
@@ -239,10 +228,9 @@ export default {
   },
   watch: {
     fechaSeleccionada() {
-      this.mostrarRutina(); // Mostrar rutina al cambiar la fecha seleccionada
+      this.mostrarRutina();
     }
   },
-
 };
 
 </script>
@@ -255,10 +243,8 @@ export default {
   margin-bottom: 20px;
 }
 
-
 .tabla_ejercicios input {
   max-width: 7ch;
-
 }
 
 .tabla_ejercicios td,
@@ -272,16 +258,12 @@ export default {
   background-color: #030303;
 }
 
-
-
 .tabla_ejercicios tr:nth-child(odd) {
   background-color: #007bff;
-  /* Color azul para filas impares */
   color: white;
 }
 
 .tabla_ejercicios tr:nth-child(even) {
   background-color: #cceeff;
-  /* Color azul más suave para filas pares */
 }
 </style>

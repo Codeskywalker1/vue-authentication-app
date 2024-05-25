@@ -244,6 +244,7 @@ export default {
         const fechaFormateada = this.fechaSeleccionada.toLocaleDateString("es-ES");
         // Crear un objeto para almacenar los ejercicios seleccionados
         const ejerciciosRutina = {};
+        
         this.ejerciciosSeleccionados.forEach((ejercicio) => {
           ejerciciosRutina[ejercicio.nombre] = {
             ...ejercicio, // Concatena las propiedades del ejercicio original
