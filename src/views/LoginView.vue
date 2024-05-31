@@ -43,6 +43,24 @@ const redirectToHome = () => {
 </script>
 
 <style>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 .login {
   margin: 300px auto;
   width: 500px;

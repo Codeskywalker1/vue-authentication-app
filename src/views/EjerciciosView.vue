@@ -1,88 +1,89 @@
 <template>
-  <div class="ejercicios">
+  <div class="container">
     <header class="header">
       <navBarAdministrador />
     </header>
-    <section>
-      <h1 id="titulo">Agregar Ejercicio</h1>
-      <div class="cuadro">
-        <form @submit.prevent="agregarEjercicio">
-          <div class="form-group">
-            <input type="text" id="exercise-name" v-model="nombre" required autocomplete="off" />
-            <label for="exercise-name">Nombre del Ejercicio:</label>
-          </div>
-          <div class="form-group">
-            <select id="exercise-type" v-model="grupoMuscular" required>
-              <option value="Pecho">Pecho</option>
-              <option value="Abs">Abs</option>
-              <option value="Espalda">Espalda</option>
-              <option value="Bíceps">Bíceps</option>
-              <option value="Tríceps">Tríceps</option>
-              <option value="Pierna">Pierna</option>
-              <option value="Hombro">Hombro</option>
-              <option value="Compuestos">Compuestos</option>
-            </select>
-            <label for="exercise-type">Grupo Muscular:</label>
-          </div>
-          <div class="form-group">
-            <input type="file" id="exercise-image" accept="image/*" @change="handleImageUpload" required />
-            <label for="exercise-image">Imagen:</label>
-          </div>
-          <button type="submit">Agregar Ejercicio</button>
-        </form>
-      </div>
-    </section>
+    <div class="info">
+      <section>
+        <h1 id="titulo">Agregar Ejercicio</h1>
+        <div class="cuadro">
+          <form @submit.prevent="agregarEjercicio">
+            <div class="form-group">
+              <input type="text" id="exercise-name" v-model="nombre" required autocomplete="off" />
+              <label for="exercise-name">Nombre del Ejercicio:</label>
+            </div>
+            <div class="form-group">
+              <select id="exercise-type" v-model="grupoMuscular" required>
+                <option value="Pecho">Pecho</option>
+                <option value="Abs">Abs</option>
+                <option value="Espalda">Espalda</option>
+                <option value="Bíceps">Bíceps</option>
+                <option value="Tríceps">Tríceps</option>
+                <option value="Pierna">Pierna</option>
+                <option value="Hombro">Hombro</option>
+                <option value="Compuestos">Compuestos</option>
+              </select>
+              <label for="exercise-type">Grupo Muscular:</label>
+            </div>
+            <div class="form-group">
+              <input type="file" id="exercise-image" accept="image/*" @change="handleImageUpload" required />
+              <label for="exercise-image">Imagen:</label>
+            </div>
+            <button class="boton2" type="submit">Agregar Ejercicio</button>
+          </form>
+        </div>
+      </section>
 
-    <section>
-      <h1 id="titulo">Ejercicios guardados</h1>
-      <div>
-        <div class="busqueda">
-          <div class="input-container">
-            <input class="buscar" type="text" v-model="busqueda" placeholder="Buscar ejercicio..."
-              @input="buscarEjercicio" />
-            <i class="fas fa-search"></i>
+      <section>
+        <h1 id="titulo">Ejercicios guardados</h1>
+        <div>
+          <div class="busqueda">
+            <div class="input-container">
+              <input class="buscar" type="text" v-model="busqueda" placeholder="Buscar ejercicio..."
+                @input="buscarEjercicio" />
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div class="button">
+            <router-link to="/clientes">
+              <button class="buttons__btn1">Regresar</button>
+            </router-link>
           </div>
         </div>
-        <div class="button">
-          <router-link to="/clientes">
-            <button class="buttons__btn1">Regresar</button>
-          </router-link>
+        <div>
+          <table class="tabla-ejercicios">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Grupo Muscular</th>
+                <th>Imagen</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(ejercicio, index) in ejerciciosFiltrados" :key="index">
+                <td>{{ ejercicio.nombre }}</td>
+                <td>{{ ejercicio.grupoMuscular }}</td>
+                <td>
+                  <img :src="ejercicio.imagenURL" alt="Imagen del ejercicio"
+                    style="max-width: 100px; max-height: 100px" />
+                </td>
+                <td>
+                  <button class="boton2" @click="eliminarEjercicio(ejercicio)">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      <div>
-        <table class="tabla-ejercicios">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Grupo Muscular</th>
-              <th>Imagen</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(ejercicio, index) in ejerciciosFiltrados" :key="index">
-              <td>{{ ejercicio.nombre }}</td>
-              <td>{{ ejercicio.grupoMuscular }}</td>
-              <td>
-                <img :src="ejercicio.imagenURL" alt="Imagen del ejercicio"
-                  style="max-width: 100px; max-height: 100px" />
-              </td>
-              <td>
-                <button @click="eliminarEjercicio(ejercicio)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+      </section>
+    </div>
   </div>
 </template>
 
 <script>
 import { db, storage } from "../Firebase/index";
-import { collection, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore";
 import navBarAdministrador from "@/components/navBarAdministrador.vue";
 
 
@@ -137,11 +138,13 @@ export default {
         const imageURL = await getDownloadURL(storageRef);
 
         // Agregar el ejercicio a la colección "ejercicios" con el nombre como ID del documento
-        await setDoc(doc(db, "ejercicios", this.nombre), {
+        const ejercicioData = {
           nombre: this.nombre,
           grupoMuscular: this.grupoMuscular,
           imagenURL: imageURL,
-        });
+        };
+
+        await setDoc(doc(db, "ejercicios", this.nombre), ejercicioData);
 
         // Limpiar los campos del formulario
         this.nombre = "";
@@ -206,10 +209,6 @@ export default {
 </script>
 
 <style>
-.header {
-  margin-bottom: 30px;
-}
-
 .cuadro {
   margin: 30px auto;
   width: 550px;
@@ -303,18 +302,6 @@ th {
   color: white;
 }
 
-button {
-  background-color: #333;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #555;
-}
-
 .tabla-ejercicios {
   width: 100%;
   border-collapse: collapse;
@@ -385,5 +372,46 @@ button:hover {
   box-shadow: 0px 15px 20px rgba(41, 207, 141, 0.4);
   transform: translateY(-7px);
   font-size: 0.9em;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.info {
+  margin-left: 2.5em;
+  margin-right: 2.5em;
+}
+
+.boton2 {
+  padding: 10px 20px;
+  background: #3b46dd;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #5e0f0f;
+}
+
+.boton2:hover {
+  font-weight: bold;
+  background-color: #150b50;
+  color: #cde211;
+  border: 1px solid #cde211;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
 }
 </style>

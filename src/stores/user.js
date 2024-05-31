@@ -39,7 +39,7 @@ export const useUserStore = defineStore("user", {
         return;
       }
       this.user = auth.currentUser;
-      this.$router.push("/datos");
+      this.$router.push("/");
     },
     async login(email, password) {
       try {

@@ -3,59 +3,64 @@
     <header class="header">
       <navBarUsuario />
     </header>
+    <section class="info">
+      <div>
+        <h1 id="titulo"> Rutina </h1>
+        <div class="box">
+          <h2 class="tituloform">Ingresa la Fecha</h2><br><br>
+          <vue3-datepicker class="sombreado" v-model="fechaSeleccionada" :typeable="true" />
+        </div>
+        <div class="cajaBoton">
+          <router-link to="/">
+            <button class="buttons__btn1">Regresar</button>
+          </router-link>
+        </div>
+      </div>
+      <div v-if="rutinaRealizada === false">
+        <form @submit.prevent="handleSubmit">
+          <table class="tabla_ejercicios">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Grupo Muscular</th>
+                <th>Ejemplo</th>
+                <th>Series</th>
+                <th>Repeticiones</th>
+                <th>Descanso</th>
+                <th>Realizado</th>
+              </tr>
+            </thead>
+            <tbody v-if="rutina.length">
+              <tr v-for="ejercicio in rutina" :key="ejercicio.nombre">
+                <td>{{ ejercicio.nombre }}</td>
+                <td>{{ ejercicio.grupoMuscular }}</td>
+                <td>
+                  <img :src="ejercicio.imagenURL" alt="Imagen del ejercicio"
+                    style="max-width: 100px; max-height: 100px" />
+                </td>
+                <td>{{ ejercicio.series }}</td>
+                <td>{{ ejercicio.repeticiones }}</td>
+                <td>{{ ejercicio.descanso }}</td>
+                <td>
+                  <input type="checkbox" :id="'ejercicioRealizado-' + ejercicio.nombre"
+                    :name="'ejercicioRealizado-' + ejercicio.nombre" v-model="ejerciciosRealizados[ejercicio.nombre]"
+                    @change="checkAllEjerciciosRealizados">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="boton2" type="submit" :disabled="!rutina.length || !todosEjerciciosRealizados">Rutina
+            Realizada</button>
+        </form>
+      </div>
+      <div class="aviso" v-else-if="rutinaRealizada === true">
+        <p>Se realizó la rutina</p>
+      </div>
+      <div v-else>
+        <p>No hay rutina</p>
+      </div>
+    </section>
   </div>
-  <section>
-    <div>
-      <h2>Ingresa la Fecha</h2>
-      <vue3-datepicker v-model="fechaSeleccionada" :typeable="true" />
-    </div>
-    <div v-if="rutinaRealizada === false">
-      <h1 id="titulo"> Rutina </h1>
-      <form @submit.prevent="handleSubmit">
-        <table class="tabla_ejercicios">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Grupo Muscular</th>
-              <th>Ejemplo</th>
-              <th>Series</th>
-              <th>Repeticiones</th>
-              <th>Descanso</th>
-              <th>Realizado</th>
-            </tr>
-          </thead>
-          <tbody v-if="rutina.length">
-            <tr v-for="ejercicio in rutina" :key="ejercicio.nombre">
-              <td>{{ ejercicio.nombre }}</td>
-              <td>{{ ejercicio.grupoMuscular }}</td>
-              <td>
-                <img :src="ejercicio.imagenURL" alt="Imagen del ejercicio"
-                  style="max-width: 100px; max-height: 100px" />
-              </td>
-              <td>{{ ejercicio.series }}</td>
-              <td>{{ ejercicio.repeticiones }}</td>
-              <td>{{ ejercicio.descanso }}</td>
-              <td>
-                <input type="checkbox" :id="'ejercicioRealizado-' + ejercicio.nombre"
-                  :name="'ejercicioRealizado-' + ejercicio.nombre" v-model="ejerciciosRealizados[ejercicio.nombre]"
-                  @change="checkAllEjerciciosRealizados">
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <button type="submit" :disabled="!rutina.length || !todosEjerciciosRealizados">Rutina Realizada</button>
-
-      </form>
-    </div>
-    <div v-else-if="rutinaRealizada === true">
-      <p>Se realizó la rutina</p>
-      <p>{{ rutinaRealizada }}</p>
-    </div>
-    <div v-else>
-      <p>No hay rutina</p>
-    </div>
-  </section>
 </template>
 
 <script>
@@ -163,7 +168,7 @@ export default {
         console.error('Error al recuperar la rutina del usuario:', this.currentUserUID);
       }
       await this.actualizarRanking();
-      //window.location.reload();
+      window.location.reload();
     },
 
     async mostrarRutina() {
@@ -236,6 +241,24 @@ export default {
 </script>
 
 <style>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 .tabla_ejercicios {
   text-align: center;
   width: 100%;
@@ -265,5 +288,113 @@ export default {
 
 .tabla_ejercicios tr:nth-child(even) {
   background-color: #cceeff;
+}
+
+#titulo {
+  text-align: left;
+  font-size: 4em;
+  font-weight: bold;
+  background: #050505;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0px 3px 3px rgba(95, 68, 247, 0.836),
+    0px -1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.info {
+  margin-top: 2em;
+  margin-left: 2.5em;
+  margin-right: 2.5em;
+}
+
+.sombreado {
+  text-align: center;
+  background-color: #282828;
+  color: white;
+}
+
+.tituloform {
+  font-size: 1.5em;
+  color: #f2f8f8;
+}
+
+.box {
+  font-weight: bold;
+  text-align: center;
+  width: 350px;
+  height: 185px;
+  padding: 60px;
+  background: #282828;
+  box-sizing: border-box;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  margin-bottom: 2em;
+  display: inline-block;
+}
+
+.boton2 {
+  margin-bottom: 2em;
+  padding: 10px 20px;
+  background: #3b46dd;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #5e0f0f;
+}
+
+.boton2:hover {
+  font-weight: bold;
+  background-color: #150b50;
+  color: #cde211;
+  border: 1px solid #cde211;
+}
+
+.boton2:disabled {
+  /* Estilos para el botón deshabilitado */
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buttons__btn1 {
+  display: inline-block;
+  text-decoration: none;
+  padding: 1em 2.5em;
+  font-size: 1em;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #fff;
+  background-color: #282828;
+  border: none;
+  border-radius: 35px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin-top: 3em;
+  margin-bottom: 2em;
+}
+
+.buttons__btn1:hover {
+  background-color: #27ca89;
+  color: #ffffff;
+  box-shadow: 0px 15px 20px rgba(41, 207, 141, 0.4);
+  transform: translateY(-7px);
+  font-size: 0.9em;
+}
+
+.cajaBoton {
+  margin-left: 10em;
+  display: inline-block;
+}
+
+.aviso {
+  font-family: bold;
+  font-size: 2em;
+  color: red;
+  font-style: italic;
 }
 </style>

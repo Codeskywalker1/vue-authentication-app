@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  chart.js:
+    specifier: ^4.4.3
+    version: 4.4.3
   date-fns:
     specifier: ^3.6.0
     version: 3.6.0
@@ -17,6 +20,9 @@ dependencies:
   vue:
     specifier: ^3.2.33
     version: 3.2.33
+  vue-chartjs:
+    specifier: ^5.3.1
+    version: 5.3.1(chart.js@4.4.3)(vue@3.2.33)
   vue-datepicker-next:
     specifier: ^1.0.3
     version: 1.0.3(vue@3.2.33)
@@ -537,6 +543,10 @@ packages:
       yargs: 17.7.2
     dev: false
 
+  /@kurkle/color@0.3.2:
+    resolution: {integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==}
+    dev: false
+
   /@protobufjs/aspromise@1.1.2:
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
     dev: false
@@ -684,6 +694,13 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       color-convert: 2.0.1
+    dev: false
+
+  /chart.js@4.4.3:
+    resolution: {integrity: sha512-qK1gkGSRYcJzqrrzdR6a+I0vQ4/R+SoODXyAjscQ/4mzuNzySaMCd+hyVxitSY1+L2fjPD1Gbn+ibNqRmwQeLw==}
+    engines: {pnpm: '>=8'}
+    dependencies:
+      '@kurkle/color': 0.3.2
     dev: false
 
   /cliui@8.0.1:
@@ -1204,6 +1221,16 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
+
+  /vue-chartjs@5.3.1(chart.js@4.4.3)(vue@3.2.33):
+    resolution: {integrity: sha512-rZjqcHBxKiHrBl0CIvcOlVEBwRhpWAVf6rDU3vUfa7HuSRmGtCslc0Oc8m16oAVuk0erzc1FCtH1VCriHsrz+A==}
+    peerDependencies:
+      chart.js: ^4.1.1
+      vue: ^3.0.0-0 || ^2.7.0
+    dependencies:
+      chart.js: 4.4.3
+      vue: 3.2.33
+    dev: false
 
   /vue-datepicker-next@1.0.3(vue@3.2.33):
     resolution: {integrity: sha512-Brqjh896BJGVxP7d6tGDsPMu0SDAB8hAdtG7zWF8VIHJB21dk1VB9KgdajD9Y9uXbg+wHN0vmL7sbMPIyehQVQ==}

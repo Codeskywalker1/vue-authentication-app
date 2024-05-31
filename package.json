@@ -7,10 +7,12 @@
     "preview": "vite preview --port 5050"
   },
   "dependencies": {
+    "chart.js": "^4.4.3",
     "date-fns": "^3.6.0",
     "firebase": "^10.7.1",
     "pinia": "^2.0.13",
     "vue": "^3.2.33",
+    "vue-chartjs": "^5.3.1",
     "vue-datepicker-next": "^1.0.3",
     "vue-router": "^4.0.14",
     "vue3-datepicker": "^0.4.0",

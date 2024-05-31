@@ -58,8 +58,7 @@ const register = async () => {
 };
 
 const agregarUsuario = async (uid, email, isAdmin) => {
-  // Agregar el usuario a la colección "usuarios" con el UID como ID del documento
-  await setDoc(doc(db, "usuarios", uid), {
+  const userData = {
     email,
     isAdmin,
     nombre: "",
@@ -77,13 +76,17 @@ const agregarUsuario = async (uid, email, isAdmin) => {
     tipoEntrenamiento: "",
     peso: 0,
     estatura: 0,
+    circunferenciaAbdominal: 0,
+    circunferenciaCadera: 0,
     alimentosFavoritos: "",
     alimentosDisgutan: "",
     alimentosAlergico: "",
     antecedentesMedicos: "",
     antecedentesPatologicos: "",
     datos: false,
-  });
+  };
+
+  await setDoc(doc(db, "usuarios", uid), userData);
 };
 
 const redirectToHome = () => {
@@ -92,6 +95,24 @@ const redirectToHome = () => {
 </script>
 
 <style>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 .register {
   margin: 300px auto;
   width: 550px;

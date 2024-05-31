@@ -1,41 +1,47 @@
 <template>
-  <header class="header">
-    <navBarUsuario />
-  </header>
-  <!-- Anuncio de rutinas -->
-  <h2 class="texts__title2">Rutinas</h2>
-  <section class="announcement">
-    <div class="announcement__grid">
-      <!-- Mostrar imágenes de rutinas -->
-      <router-link v-for="(imageUrl, index) in imageUrls.slice(0, 4)" :key="index" :to="`/rutinapublico/${index}`"
-        class="announcement__item" @click="selectRutina(index)">
-        <img :src="imageUrl" :alt="'Rutina ' + index" style="width: 400px" />
-      </router-link>
-      <!-- Quinta imagen de rutinas -->
-      <router-link :to="'/rutina'" class="announcement__item">
-        <img :src="imageUrls[4]" alt="Rutina 4" style="width: 400px" />
-      </router-link>
-    </div>
-  </section>
+  <div class="container">
+    <header class="header">
+      <navBarUsuario />
+    </header>
+    <div class="info">
+      <!-- Anuncio de rutinas -->
+      <h2 class="texts__title2">Rutinas</h2>
+      <section class="announcement">
+        <div class="announcement__grid">
+          <!-- Mostrar imágenes de rutinas -->
+          <router-link v-for="(imageUrl, index) in imageUrls.slice(0, 4)" :key="index" :to="`/rutinapublico/${index}`"
+            class="announcement__item" @click="selectRutina(index)">
+            <img :src="imageUrl" :alt="'Rutina ' + index" style="width: 400px" />
+          </router-link>
+          <!-- Quinta imagen de rutinas -->
+          <router-link :to="'/rutina'" class="announcement__item">
+            <img :src="imageUrls[4]" alt="Rutina 4" style="width: 400px" />
+          </router-link>
+        </div>
+      </section>
 
-  <!-- Anuncio de dietas -->
-  <h2 class="texts__title2">Dietas</h2>
-  <section class="announcement">
-    <div class="announcement__grid">
-      <!-- Mostrar imágenes de dietas -->
-      <router-link v-for="(imageUrl, index) in dietImageUrls.slice(0, 4)" :key="index" :to="`/dietapublico/${index}`"
-        class="announcement__item" @click="selectDieta(index)">
-        <img :src="imageUrl" :alt="'Dieta ' + index" style="width: 400px" />
-      </router-link>
-      <!-- Última imagen de dietas -->
-      <router-link :to="'/dieta'" class="announcement__item">
-        <img :src="dietImageUrls[4]" alt="Dieta 4" style="width: 400px" />
-      </router-link>
+      <!-- Anuncio de dietas -->
+      <h2 class="texts__title2">Dietas</h2>
+      <section class="announcement">
+        <div class="announcement__grid">
+          <!-- Mostrar imágenes de dietas -->
+          <router-link v-for="(imageUrl, index) in dietImageUrls.slice(0, 4)" :key="index"
+            :to="`/dietapublico/${index}`" class="announcement__item" @click="selectDieta(index)">
+            <img :src="imageUrl" :alt="'Dieta ' + index" style="width: 400px" />
+          </router-link>
+          <!-- Última imagen de dietas -->
+          <router-link :to="'/dieta'" class="announcement__item">
+            <img :src="dietImageUrls[4]" alt="Dieta 4" style="width: 400px" />
+          </router-link>
+        </div>
+      </section>
+      <button class="buttons__btn buttons__btn--logout" @click.prevent="logout">
+        Logout
+      </button>
     </div>
-  </section>
-  <button class="buttons__btn buttons__btn--logout" @click.prevent="logout">
-    Logout
-  </button>
+
+  </div>
+
 </template>
 
 
@@ -102,6 +108,24 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 .header {
   margin-bottom: 30px;
 }
@@ -113,7 +137,7 @@ export default {
 .texts__title2 {
   margin-top: 1em;
   text-align: left;
-  font-size: 2.5em;
+  font-size: 3em;
   font-weight: bold;
   background: #050505;
   -webkit-background-clip: text;
@@ -175,5 +199,28 @@ export default {
   background-color: #f0f0f0;
   padding: 10px;
   border-radius: 15px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.info {
+  margin-left: 2.5em;
+  margin-right: 2.5em;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
 }
 </style>

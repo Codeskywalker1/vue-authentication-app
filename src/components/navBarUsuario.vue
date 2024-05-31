@@ -13,6 +13,7 @@
 
 <style>
 .navbarAdmin {
+  width: 100;
   font-size: 25px;
   display: flex;
   justify-content: space-around;
@@ -22,6 +23,8 @@
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
   border-radius: 3px;
   align-items: center;
+  top: 0;
+  left: 0;
 }
 
 .navbarAdmin ul {

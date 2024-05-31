@@ -1,26 +1,34 @@
 <template>
-  <div class="register">
-    <h2>Register</h2>
-    <form @submit.prevent="register">
-      <div class="register__input">
-        <input type="email" required v-model="email" />
-        <label>Email</label>
-      </div>
-      <div class="register__input">
-        <input type="password" required v-model="password" />
-        <label>Password</label>
-      </div>
-      <div class="register__input">
-        <label for="isAdmin">Asignar como administrador?</label>
-        <input type="checkbox" id="isAdmin" v-model="isAdmin" />
-      </div>
-      <button class="register__submit" type="submit">Register</button>
-      <button class="return" @click="redirectToHome">Return</button>
-    </form>
+  <div class="container">
+    <header class="header">
+      <navBarAdministrador />
+    </header>
+    <div class="register">
+      <h2>Registro</h2>
+      <form @submit.prevent="register">
+        <div class="register__input">
+          <input type="email" required v-model="email" />
+          <label>Email</label>
+        </div>
+        <div class="register__input">
+          <input type="password" required v-model="password" />
+          <label>Password</label>
+        </div>
+        <div id="check" class="register__input">
+          <label for="isAdmin">Asignar como administrador?</label>
+          <input type="checkbox" id="isAdmin" v-model="isAdmin" />
+        </div>
+        <div class="botones">
+          <button class="boton2" type="submit">Registrar</button>
+          <button class="boton2" @click="redirectToHome">Regresar</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
+import navBarAdministrador from "@/components/navBarAdministrador.vue";
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';
@@ -66,39 +74,61 @@ const agregarUsuario = async (uid, email, isAdmin) => {
   } else {
     await setDoc(doc(db, "usuarios", uid), {
       email,
-      isAdmin,
-      nombre: "",
-      apellidoPaterno: "",
-      apellidoMaterno: "",
-      fechaDeNacimiento: null,
-      estadoCivil: "",
-      domicilio: "",
-      deporte: "",
-      objetivo: "",
-      diasEntrenamiento: 0,
-      tiempoEntrenamiento: 0,
-      antiguedadEntrenamiento: 0,
-      peso: 0,
-      estatura: 0,
-      alimentosFavoritos: "",
-      alimentosDisgutan: "",
-      alimentosAlergia: "",
-      antMedFamiliares: "",
-      antPatologicos: "",
-      datos: false,
-    });
+    isAdmin,
+    nombre: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
+    fechaNacimiento: null,
+    edad: 0,
+    estadoCivil: "",
+    domicilio: "",
+    deporte: "",
+    objetivo: "",
+    diasEntrenamiento: 0,
+    tiempoPorDiaEntrenamiento: 0,
+    antiguedadEntrenamiento: 0,
+    tipoEntrenamiento: "",
+    peso: 0,
+    estatura: 0,
+    circunferenciaAbdominal: 0,
+    circunferenciaCadera: 0,
+    alimentosFavoritos: "",
+    alimentosDisgutan: "",
+    alimentosAlergico: "",
+    antecedentesMedicos: "",
+    antecedentesPatologicos: "",
+    datos: false,
+  });
   }
 };
 
 const redirectToHome = () => {
-  router.push({ name: 'home' });
+  router.push({ name: 'clientes' });
 };
 </script>
 
 <style>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 .register {
   margin: 100px auto;
-  width: 400px;
+  width: 550px;
   padding: 40px;
   background: #282828;
   box-sizing: border-box;
@@ -153,24 +183,26 @@ const redirectToHome = () => {
   margin-left: 50%;
 }
 
-.register__submit {
-  color: #1b1c1b;
-  padding: 0.7em 1.7em;
-  font-size: 18px;
-  border-radius: 0.5em;
-  background: #e8e8e8;
+.boton2 {
+  padding: 10px 20px;
+  background: #3b46dd;
+  color: white;
   border: none;
   cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #5e0f0f;
 }
 
-.return {
-  color: #1b1c1b;
-  margin-left: 3.5em;
-  padding: 0.7em 1.7em;
-  font-size: 18px;
-  border-radius: 0.5em;
-  background: #e8e8e8;
-  border: none;
-  cursor: pointer;
+.boton2:hover {
+  font-weight: bold;
+  background-color: #150b50;
+  color: #cde211;
+  border: 1px solid #cde211;
+}
+
+.botones {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

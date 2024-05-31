@@ -1,73 +1,73 @@
 <template>
-  <div class="clientes">
+
+  <div class="container">
     <header class="header">
       <navBarAdministrador />
     </header>
-    <h1 id="titulo">Clientes</h1>
-    <div class="seleccionado-info">
-      <p>{{ clienteSeleccionado }}</p>
-    </div>
-    <div>
-      <div class="button">
-        <router-link to="/citas">
-          <button class="buttons__btn1">Agendar</button>
-        </router-link>
+    <div class="info">
+      <h1 id="titulo">Clientes</h1>
+      <div class="seleccionado-info">
+        <p>{{ clienteSeleccionado }}</p>
       </div>
-      <div class="button">
-        <router-link to="/asignarrutina">
-          <button class="buttons__btn1">Rutina</button>
-        </router-link>
+      <div>
+        <div class="button">
+          <router-link to="/citas">
+            <button class="buttons__btn1">Agendar</button>
+          </router-link>
+        </div>
+        <div class="button">
+          <router-link to="/asignarrutina">
+            <button class="buttons__btn1">Rutina</button>
+          </router-link>
+        </div>
+        <div class="button">
+          <router-link to="/asignardieta">
+            <button class="buttons__btn1">Dieta</button>
+          </router-link>
+        </div>
+        <div class="button">
+          <router-link to="/datos">
+            <button class="buttons__btn1">Datos</button>
+          </router-link>
+        </div>
+        <div class="button">
+          <router-link to="/avances">
+            <button class="buttons__btn1">Avance</button>
+          </router-link>
+        </div>
       </div>
-      <div class="button">
-        <router-link to="/asignardieta">
-          <button class="buttons__btn1">Dieta</button>
-        </router-link>
+      <div class="busqueda">
+        <div class="input-container">
+          <input class="buscar" type="text" v-model="busqueda" placeholder="Buscar cliente..." @input="buscarCliente" />
+          <i class="fas fa-search"></i>
+        </div>
       </div>
-      <div class="button">
-        <router-link to="/datos">
-          <button class="buttons__btn1">Datos</button>
-        </router-link>
-      </div>
-      <div class="button">
-        <router-link to="/avances">
-          <button class="buttons__btn1">Avance</button>
-        </router-link>
-      </div>
-    </div>
-    <div class="busqueda">
-      <div class="input-container">
-        <input class="buscar" type="text" v-model="busqueda" placeholder="Buscar cliente..." @input="buscarCliente" />
-        <i class="fas fa-search"></i>
-      </div>
-    </div>
 
-    <table class="tabla-usuarios">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Apellido Paterno</th>
-          <th>Apellido Materno</th>
-          <th>Correo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(usuario, index) in usuariosFiltrados" :key="index" @click="seleccionarCliente(usuario)" :class="{
-          'fila-par': index % 2 === 0,
-          'fila-impar': index % 2 !== 0,
-        }">
-          <td>{{ usuario.nombre }}</td>
-          <td>{{ usuario.apellidoPaterno }}</td>
-          <td>{{ usuario.apellidoMaterno }}</td>
-          <td>{{ usuario.email }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <footer>
+      <table class="tabla-usuarios">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido Paterno</th>
+            <th>Apellido Materno</th>
+            <th>Correo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(usuario, index) in usuariosFiltrados" :key="index" @click="seleccionarCliente(usuario)" :class="{
+            'fila-par': index % 2 === 0,
+            'fila-impar': index % 2 !== 0,
+          }">
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.apellidoPaterno }}</td>
+            <td>{{ usuario.apellidoMaterno }}</td>
+            <td>{{ usuario.email }}</td>
+          </tr>
+        </tbody>
+      </table>
       <button class="buttons__btn buttons__btn--logout" @click.prevent="logout">
         Logout
       </button>
-    </footer>
+    </div>
   </div>
 </template>
 
@@ -175,10 +175,6 @@ export default {
   color: #ffffff;
 }
 
-
-
-
-
 .buttons {
   display: flex;
   justify-content: space-evenly;
@@ -275,5 +271,29 @@ export default {
 
 .buscar {
   font-size: 1.3em;
+}
+
+.info {
+  margin-left: 2.5em;
+  margin-right: 2.5em;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
 }
 </style>

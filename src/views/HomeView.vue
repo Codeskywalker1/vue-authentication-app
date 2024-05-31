@@ -1,44 +1,43 @@
 <template>
-  <div>
+  <div class="container">
     <header>
       <h1 class="texts__title">Inicio Usuario</h1>
     </header>
-    <!-- Anuncio de rutinas -->
-    <h2 class="texts__title2">Rutinas</h2>
-    <section class="announcement">
-      <div class="announcement__grid">
-        <!-- Mostrar imágenes de rutinas -->
-        <router-link v-for="(imageUrl, index) in imageUrls.slice(0, 4)" :key="index" :to="`/rutinapublico/${index}`"
-          class="announcement__item" @click="selectRutina(index)">
-          <img :src="imageUrl" alt="Rutina" style="width: 400px" />
-        </router-link>
-      </div>
-    </section>
+    <div class="info">
+      <!-- Anuncio de rutinas -->
+      <h2 class="texts__title2">Rutinas</h2>
+      <section class="announcement">
+        <div class="announcement__grid">
+          <!-- Mostrar imágenes de rutinas -->
+          <router-link v-for="(imageUrl, index) in imageUrls.slice(0, 4)" :key="index" :to="`/rutinapublico/${index}`"
+            class="announcement__item" @click="selectRutina(index)">
+            <img :src="imageUrl" alt="Rutina" style="width: 400px" />
+          </router-link>
+        </div>
+      </section>
+      <!-- Anuncio de dietas -->
+      <h2 class="texts__title2">Dietas</h2>
+      <section class="announcement">
+        <div class="announcement__grid">
+          <!-- Mostrar imágenes de dietas -->
+          <router-link v-for="(imageUrl, index) in dietImageUrls.slice(0, 4)" :key="index"
+            :to="`/dietapublico/${index}`" class="announcement__item" @click="selectDieta(index)">
+            <img :src="imageUrl" alt="Dieta" style="width: 400px" />
+          </router-link>
+        </div>
+      </section>
+      <section class="buttons">
+        <router-link class="buttons__btn buttons__btn--login" to="/login">Iniciar Sesión</router-link>
+        <router-link class="buttons__btn buttons__btn--register" to="/register">Registrarse</router-link>
+      </section>
+    </div>
 
-    <!-- Anuncio de dietas -->
-    <h2 class="texts__title2">Dietas</h2>
-    <section class="announcement">
-      <div class="announcement__grid">
-        <!-- Mostrar imágenes de dietas -->
-        <router-link v-for="(imageUrl, index) in dietImageUrls.slice(0, 4)" :key="index" :to="`/dietapublico/${index}`"
-          class="announcement__item" @click="selectDieta(index)">
-          <img :src="imageUrl" alt="Dieta" style="width: 400px" />
-        </router-link>
-      </div>
-    </section>
-
-    <section class="buttons">
-      <router-link class="buttons__btn buttons__btn--login" to="/login">Iniciar Sesión</router-link>
-
-      <router-link class="buttons__btn buttons__btn--register" to="/register">Registrarse</router-link>
-    </section>
   </div>
 </template>
 
 <script>
 import { useUserStore } from "../stores/user";
 import { storage } from "../Firebase/index";
-
 import { ref, listAll, getDownloadURL } from "firebase/storage";
 
 export default {
@@ -90,15 +89,29 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 header {
   width: 100%;
   background-color: #157dcc;
   text-align: center;
   margin-bottom: 50px;
-}
-
-.texts__title {
-  font-size: 3.5rem;
 }
 
 .texts__title2 {
@@ -128,7 +141,7 @@ header {
   padding: 1.3em 3em;
   font-size: 12px;
   font-weight: bold;
-  
+
   letter-spacing: 2px;
   color: #fff;
   background-color: #282828;
@@ -172,5 +185,28 @@ header {
   background-color: #f0f0f0;
   padding: 10px;
   border-radius: 15px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.info {
+  margin-left: 2.5em;
+  margin-right: 2.5em;
+}
+
+@media (max-width: 1080px) {
+  .sections-container {
+    flex-direction: column;
+  }
+
+  .section-left,
+  .section-right {
+    width: 100%;
+    border-right: none;
+  }
 }
 </style>
